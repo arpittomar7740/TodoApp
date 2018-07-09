@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+   
+  </head>
+  
+<style>
+ span.done-true{
+    color: gray;
+    font-style: italic;
+    text-decoration: line-through;
+  }
+  
+  span[contenteditable="true"]{
+    background: gray;
+    padding: 3px;
+  }
+  
+</style>
+  
+  
+<body ng-app="mainApp" ng-controller="appCtrl">
+    <main>
+      <div class="main-div">
+        <h1 class="mx-5">Add A Task</h1>
+        <input ng-model="task" ng-keyup="searchEnter();" class="mx-5" type="text">
+        <div id="tasksToShow">
+          <ul>
+            <li ng-repeat="oneTask in tasks track by $index">
+              <input type="checkbox" ng-model="oneTask.status">
+              <span contenteditable="false" ng-dblclick="contentEdit(oneTask.taskMessage)" ng-keydown="enterAgain(oneTask.taskMessage);" ng-model="oneTasks.taskMessage" class="done-{{oneTask.status}}">
+                {{oneTask.taskMessage}}
+              </span>
+              
+            </li>
+          </ul>
+          
+        </div>
+      </div>
+    </main>
+  </body>
+    
+       <script>
+      var appX = angular.module('mainApp',[]);
+
+            appX.controller('appCtrl', function($scope){
+                $scope.tasks = [];
+                var taskData = localStorage['tasksList'];
+                if(taskData !== undefined){
+                $scope.tasks = JSON.parse(taskData);
+                }
+                
+                
+            $scope.searchEnter = function(){
+                if(event.keyCode == 13 || event.which == 13 && $scope.task != ""){
+                $scope.addTask();
+              }
+              };
+                
+            $scope.addTask = function(){
+                $scope.tasks.push({'taskMessage':$scope.task, 'status':false});
+                $scope.task = "";
+                localStorage['tasksList'] = JSON.stringify($scope.tasks);
+              };
+                
+            $scope.contentEdit = function(msg){
+                console.log(msg);
+                for(i=0; i<$scope.tasks.length;i++){
+                  if($scope.tasks[i].taskMessage == msg){
+                    $scope.tasks[i].taskMessage = event.target.innerText;
+                    console.log(event.target.innerText);
+                  }
+                }
+                localStorage['tasksList'] = JSON.stringify($scope.tasks);
+                event.target.contentEditable = event.target.contentEditable == "false" ? "true" : "false";
+              }
+
+              $scope.enterAgain = function(msg){
+                    if(event.keyCode == 13 || event.which == 13 && msg != ""){
+                      $scope.contentEdit(msg);
+                    }
+              };
+
+            });
+      
+      
+      </script>
+</html>
+  
